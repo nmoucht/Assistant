@@ -24,6 +24,10 @@ def parse_request(request_text):
 
     if (intent == 'meeting_set'):
         action = 'schedule'
+    elif (intent == 'yes'):
+        action = 'accept'
+    elif (intent == 'no'):
+        action = 'reject'
     else:
         print('no action found for intent {}'.format(intent))
         action = None
@@ -64,8 +68,12 @@ def suggest_time(schedule, time_now, organizing_data):
             # if block_number < current_block, blocks
             # would be substracted, _which is correct_
 
-            time_pressure_index = calculate_time_pressure_index(
-                total_block_distance, organizing_data)
+            if block.get_organizing_data()['available'] == False:
+                time_pressure_index = 0
+            else:
+                time_pressure_index = calculate_time_pressure_index(
+                    total_block_distance, organizing_data)
+
             block_match_index = calculate_block_match_index(
                 block, organizing_data)
 
@@ -91,6 +99,12 @@ def calculate_block_match_index(block, organizing_data):
     # consider if the block is available
     if block_organizing_data['available'] == False:
         index -= 2
+
+    block_time = block_organizing_data['block_time']
+    rejected_blocks = block_organizing_data['blocks_rejected']
+    for start, end in rejected_blocks:
+        if block_time >= start and block_time < end:
+            index -= 1000 # block is rejected!
 
     index += block_organizing_data['general_priority']
 
