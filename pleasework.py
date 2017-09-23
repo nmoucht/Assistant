@@ -80,29 +80,10 @@ def main():
     for event in events:
         print (event)
         start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+        print(start, event['summary'], event['id'])
 
 
 def create_event(event_dict):
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
-    start_time = event_dict["start"]["dateTime"]
-    end_time = event_dict["end"]["dateTime"]
-    eventsResult = service.events().list(
-        calendarId='primary', timeMax=end_time, timeMin=start_time, maxResults=10, singleEvents=True,
-        orderBy='startTime').execute()
-    events = eventsResult.get('items', [])
-    print(event_dict)
-    print(events)
-    if not events:
-        event = service.events().insert(calendarId='primary', body=event_dict).execute()
-        print('Event created: %s' % (event.get('htmlLink')))
-    else:
-        print("Busy")
-        return "Busy"
-
-def cancel_event(event_dict):
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
@@ -167,8 +148,16 @@ def convert_time_to_block(events):
             print (time_Block_Index/0.5)
             print(duration)
 
+def cancel_event(event_id):
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http=http)
+    service.events().delete(calendarId='primary', eventId=event_id).execute()
+    print("Cancelled")
+    return "Cancelled"
+
 
 if __name__ == '__main__':
     #create_event(event_dict)
    #main()
-   fourteen_day_schedule()
+   #fourteen_day_schedule()
