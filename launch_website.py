@@ -23,15 +23,14 @@ def showSignUp():
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
     users.insert_one(request.form.to_dict())
-    #run google calendar authentification
-    google()
 
 @app.route('/google')
 def google():
-    #google code for calendar goes here, could add success screen after sign in
-    
+    #google calendar code
+    return "something"
    
 
 if __name__ == "__main__":
     app.run()
     #app.run(port=5002)
+
