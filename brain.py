@@ -29,3 +29,7 @@ def parse_request(request_text):
         action = None
 
     return action
+
+# schedule is a Schedule object, time_now is an array with day and block#
+def suggest_time(schedule, time_now, organizing_data):
+    print('I suggest 5')
