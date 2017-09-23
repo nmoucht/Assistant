@@ -86,8 +86,15 @@ def suggest_time(schedule, time_now, organizing_data):
         return -1 # no convenient time was found
 
 def calculate_block_match_index(block, organizing_data):
-    # stub
-    return block.get_organizing_data()['general_priority']
+    block_organizing_data = block.get_organizing_data()
+    index = 0
+    # consider if the block is available
+    if block_organizing_data['available'] == False:
+        index -= 2
+
+    index += block_organizing_data['general_priority']
+
+    return index
 
 def calculate_time_pressure_index(time_distance, organizing_data):
     # calculate exponential term with the block_distance (each block = 1hr)
