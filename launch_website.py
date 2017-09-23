@@ -23,6 +23,7 @@ def showSignUp():
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
     users.insert_one(request.form.to_dict())
+    users.close()
 
 @app.route('/google')
 def google():
