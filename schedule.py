@@ -14,6 +14,11 @@ class Schedule:
                 block_list.append(Block())
             self.contents.append(block_list)# 24 blocks of one hour
 
+    def day_block_to_date_string(self, day_block):
+        # TODO
+        # day_block = (day_number, block_number)
+        return "January 20, 14hs"
+
     def __getitem__(self, key):
         return self.contents[key]
 

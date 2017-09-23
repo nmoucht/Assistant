@@ -1,19 +1,14 @@
 # the information that one block in the calendar will contain
 
+import organizing_data_helper
+
 class Block:
     def __init__(self):
         self.purpose = ''
         self.comments = ''
         self.location = ''
-        self.organizing_data = {
-            'priority': 1, # possible default priority
-            'location': (0, 0, 0), # gps coordinates
-            'purpose': '', # same as self.purpose. same purpose can
-            # be considered same activity and be used to find patterns
-            'blocks_rejected': [], # in these blocks he is not available
-            'time_ranges_convenience': [] # each element is 3-element tuple,
-            # first two elements are start and end, third is convenience
-        }
+        self.available = True
+        self.organizing_data = organizing_data_helper.get_default()
 
     def get_purpose(self):
         return self.purpose
