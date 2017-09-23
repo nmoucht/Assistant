@@ -17,10 +17,21 @@ def parse_request(request_text):
     #print(dir(response))
 
     # intent is a list, in which the second element is the confidence (0-1)
-    intent = response.get('entities').get('intent')[0].get('value')
+    entities = response.get('entities')
+
+    intent = ''
+    if 'duration' in entities:
+        duration_seconds = entities['duration'][0]['normalized']['value']
+        # because there are 48 blocks, each block is 30 minutes
+        duration_blocks = int(duration_seconds / (30 * 60))
+        duration = duration_blocks
+        intent = 'duration_set'
+    elif 'intent' in entities:
+        intent = entities.get('intent')[0].get('value')
 
     # the intended action will be stored here
     action = ''
+    info = None
 
     if (intent == 'meeting_set'):
         action = 'schedule'
@@ -28,14 +39,17 @@ def parse_request(request_text):
         action = 'accept'
     elif (intent == 'no'):
         action = 'reject'
+    elif (intent == 'duration_set'):
+        action = 'set_duration'
+        info = duration
     else:
         print('no action found for intent {}'.format(intent))
         action = None
 
-    return action
+    return (action, info)
 
 # schedule is a Schedule object, time_now is a tuple: (day, block#)
-def suggest_time(schedule, time_now, organizing_data):
+def suggest_time(schedule, time_now, organizing_data, meeting_duration = 1):
     # the basic first version of the time suggestion function calculates a
     # how much match there is between block properties and organizing data
     # properties, and adds them to an eponential decay function which tries
@@ -43,7 +57,7 @@ def suggest_time(schedule, time_now, organizing_data):
     current_day, current_block = time_now
 
     highest_convenience_index = -999
-    day_block_most_convenient = (
+    starting_day_block_most_convenient = (
         0, 0) # (day_number, block_number)
     # if highest_convenience_index is below 0, a convenient time was not found
 
@@ -60,6 +74,9 @@ def suggest_time(schedule, time_now, organizing_data):
                 # check only for blocks in the future
                 block_number += 1
                 continue
+            if block_number + meeting_duration - 1 > 47:
+                # not enough time in a day
+                break
             # calculate exponential term of convenience index
             total_block_distance = 0
             total_block_distance += 24 * (day_number - current_day)
@@ -68,20 +85,23 @@ def suggest_time(schedule, time_now, organizing_data):
             # if block_number < current_block, blocks
             # would be substracted, _which is correct_
 
-            if block.get_organizing_data()['available'] == False:
-                time_pressure_index = 0
-            else:
-                time_pressure_index = calculate_time_pressure_index(
-                    total_block_distance, organizing_data)
+            total_convenience_index = 0
+            for i in range(meeting_duration):
+                current_block_distance = total_block_distance + i
+                # meeting_block is the block being checked now
+                #meeting_block = schedule[day_number][block_number]
+                meeting_block = block_list[block_number]
+                convenience_index = calculate_convenience_index(
+                    current_block_distance, meeting_block, organizing_data)
 
-            block_match_index = calculate_block_match_index(
-                block, organizing_data)
 
-            convenience_index = time_pressure_index + block_match_index
+                total_convenience_index += convenience_index
 
+            convenience_index = total_convenience_index / meeting_duration
+            # when meetings last more than one block, the average counts
             if convenience_index > highest_convenience_index:
                 highest_convenience_index = convenience_index
-                day_block_most_convenient = (day_number, block_number)
+                starting_day_block_most_convenient = (day_number, block_number)
 
             # at the end of the for loop
             block_number += 1
@@ -89,7 +109,7 @@ def suggest_time(schedule, time_now, organizing_data):
         day_number += 1
 
     if highest_convenience_index > 0:
-        return day_block_most_convenient
+        return starting_day_block_most_convenient
     else:
         return -1 # no convenient time was found
 
@@ -116,7 +136,21 @@ def calculate_time_pressure_index(time_distance, organizing_data):
     urgency_base = 5 # very debatable default
     # in infinity term will be 0, which is fine because as long as it isn't
     # incovenient for them to meet, the block match term will be positive
-    growth_factor = 0.99
+    growth_factor = 0.995
 
     return (
         priority_constant_multiplier * urgency_base * (growth_factor ** time_distance))
+
+def calculate_convenience_index(total_block_distance, block, organizing_data):
+    if block.get_organizing_data()['available'] == False:
+        time_pressure_index = 0
+    else:
+        time_pressure_index = calculate_time_pressure_index(
+            total_block_distance, organizing_data)
+
+    block_match_index = calculate_block_match_index(
+        block, organizing_data)
+
+    convenience_index = time_pressure_index + block_match_index
+
+    return convenience_index
