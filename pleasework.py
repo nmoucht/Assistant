@@ -51,15 +51,15 @@ def get_credentials():
     return credentials
 
 user_suggest = {
-      'summary': 'RoshanRishav Lunch',
+      'summary': 'PARTY',
       'location': 'MC',
       'description': '',
       'start': {
-        'dateTime': '2017-09-26T09:00:00-07:00',
+        'dateTime': '2017-09-28T09:00:00-07:00',
         'timeZone': 'America/New_York',
       },
       'end': {
-        'dateTime': '2017-09-27T17:00:00-07:00',
+        'dateTime': '2017-09-29T17:00:00-07:00',
         'timeZone': 'America/New_York',
       }
      }
