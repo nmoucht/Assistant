@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Sign up for Virtual Assistant</title>
+    <title>Virtual Assistant</title>
 
     <!--
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,6 +14,14 @@
       integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
       crossorigin="anonymous"></script>
 
+    <script src="https://cdn.jsdelivr.net/jquery.typeit/4.4.0/typeit.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,500" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <meta name="google-signin-client_id" content="35011833406-cg3foml0gn62v76msbn5oee9kcktpjop.apps.googleusercontent.com">
 
 
     <!-- materialize -->
@@ -23,13 +31,14 @@
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 
-
     <link href="../static/css/basic.css" rel="stylesheet">
-
+    <script type="text/javascript" src="../static/js/signUp.js"></script>
 
 </head>
 
 <body>
+
+ <div class="header">
   <style>
   #canvas{background:#222;}
   html{margin:0;padding:0;background:#222;}
@@ -43,42 +52,58 @@
     <div id="right">
     </div>
   </div>
-<!--
-      <div class="header">
-          <nav>
-              <ul class="nav nav-pills pull-right">
-                  <li role="presentation" class="active"><a href="#">Home</a>
-                  </li>
-                  <li role="presentation"><a href="#">Sign In</a>
-                  </li>
-                  <li role="presentation"><a href="showSignUp">Sign Up</a>
-                  </li>
-              </ul>
-          </nav>
-      </div>
 
       <div class="jumbotron">
-          <h1>Sign up for Virtual Assistant</h1>
-          <p class="lead"></p>
-          <p><a class="btn btn-lg btn-success" href="showSignUp" role="button">Sign up today</a>
-          </p>
+          <h1 id="heading"></h1>
+      </div>
+      <div id="btnSignUp">
+        <!-- <button class="btn btn-lg btn-success" href="showSignUp()" role="button"> Sign up today 
+        </button> -->
+        <div class="g-signin2" 
+         data-onsuccess="onSignIn"
+        data-scope="https://www.googleapis.com/auth/plus.login"
+        data-accesstype="offline"></div>
+        <!-- data-redirecturi="http://localhost:5000/signUp" -->
       </div>
 
-      <div class="row marketing">
-          <div class="col-lg-6">
-              <h4>Hello</h4>
-              <p>Hello.</p>
+      <div>
+        <p id="twilio_text"></p>
       </div>
 
-      <footer class="footer">
-          <p>&copy; Created 2017</p>
+     <!--  <div class="row marketing">
+        
+      </div> -->
+
+     <!--  <footer class="footer">
+          <p>&copy; Created with Love!</p>
       </footer>
--->
+ -->
 
 
 
 
-<script>	window.requestAnimFrame = function()
+<script>	
+
+  function onSignIn(googleUser) {
+    if(googleUser.isSignedIn || googleUser.isSignedIn()){
+    var profile = googleUser.getBasicProfile();
+    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+    xmlhttp.open("POST", "/signUp");
+    xmlhttp.setRequestHeader("Content-Type", "application/json");
+    xmlhttp.send(JSON.stringify({inputName : profile.getName(), inputEmail : profile.getEmail()}));
+
+    $("#twilio_text").text("Hey! Here is your Alfred's number : 732 917 4392");
+    
+  }
+
+}
+
+  window.requestAnimFrame = function()
 	{
 		return (
 			window.requestAnimationFrame       ||
@@ -96,11 +121,11 @@
 
     var context = canvas.getContext('2d');
 
-var W = window.innerWidth, H = window.innerHeight;
-	canvas.width = W;
-	canvas.height = H;
+var W = (window.innerWidth), H = window.innerHeight;
+	canvas.width = W*4;
+	canvas.height = H*4;
 
-	var particle_count = 80,
+	var particle_count = 200,
 		particles = [],
 		couleurs   = ["#2ecc71", "#3498db", "#f1c40f","#e74c3c"];
     function Particle()
@@ -110,8 +135,8 @@ var W = window.innerWidth, H = window.innerHeight;
         this.x = Math.floor((Math.random() * canvas.width/2) + this.radius);
         this.y =  Math.floor((Math.random() * canvas.height/2) + this.radius);
         this.color = couleurs[Math.round(Math.random()*couleurs.length)];
-        this.speedx = Math.round((Math.random()*201)+0)/100;
-        this.speedy = Math.round((Math.random()*201)+0)/100;
+        this.speedx = (Math.round((Math.random()*201)+0)/100)*0.60;
+        this.speedy = (Math.round((Math.random()*201)+0)/100)*0.60;
 
         switch (Math.round(Math.random()*couleurs.length))
         {
@@ -204,13 +229,35 @@ var W = window.innerWidth, H = window.innerHeight;
         requestAnimFrame(animate);
     }
 
-
-
-
     animate();
 
 //# sourceURL=pen.js
 </script>
 </body>
+
+          <script>
+              $('#heading').typeIt({
+                     speed: 50,
+                     autoStart: true
+                })
+                .tiType('Welcoke')
+                .tiPause(1000)
+                .tiDelete(2)
+                .tiType('me ')
+                .tiPause(500)
+                .tiType('to your Virtual Ass')
+                .tiPause(900)
+                .tiType('istant')
+                .tiBreak() .tiPause(500)
+                .tiSettings({speed: 50})
+                .tiDelete()
+                .tiSettings({speed: 100})
+                .tiType(' I\'m (AI)fred...')
+                .tiBreak() .tiPause(500)
+                .tiSettings({speed: 100})
+                .tiType('and I\'ll help you manage your time better!')
+                .tiPause(2000)
+
+          </script>
 
 </html>

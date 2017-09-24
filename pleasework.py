@@ -51,15 +51,15 @@ def get_credentials():
     return credentials
 
 user_suggest = {
-      'summary': 'RoshanRishav Lunch',
+      'summary': 'PARTY',
       'location': 'MC',
       'description': '',
       'start': {
-        'dateTime': '2017-09-22T09:00:00-07:00',
+        'dateTime': '2017-09-28T09:00:00-07:00',
         'timeZone': 'America/New_York',
       },
       'end': {
-        'dateTime': '2017-09-22T17:00:00-07:00',
+        'dateTime': '2017-09-29T17:00:00-07:00',
         'timeZone': 'America/New_York',
       }
      }
@@ -93,11 +93,13 @@ def create_event(event_dict):
         calendarId='primary', timeMax=end_time, timeMin=start_time, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
-    print(event_dict)
+    #print(event_dict)
     print(events)
     if not events:
         event = service.events().insert(calendarId='primary', body=event_dict).execute()
         print('Event created: %s' % (event.get('htmlLink')))
+        print(event)
+        return [event["id"] , "added"]
     else:
         print("Busy")
         return "Busy"
@@ -158,6 +160,6 @@ def cancel_event(event_id):
 
 
 if __name__ == '__main__':
-    #create_event(event_dict)
-   #main()
-   #fourteen_day_schedule()
+    create_event(user_suggest)
+    #main()
+    #fourteen_day_schedule()
