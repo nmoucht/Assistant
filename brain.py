@@ -28,6 +28,9 @@ def parse_request(request_text):
         intent = 'duration_set'
     elif 'intent' in entities:
         intent = entities.get('intent')[0].get('value')
+    elif 'datetime' in entities:
+        datetime = entities['datetime'][0]['value']
+        intent = 'date_set'
 
     # the intended action will be stored here
     action = ''
@@ -42,6 +45,9 @@ def parse_request(request_text):
     elif (intent == 'duration_set'):
         action = 'set_duration'
         info = duration
+    elif (intent == 'date_set'):
+        action = 'set_date'
+        info = datetime
     else:
         print('no action found for intent {}'.format(intent))
         action = None
