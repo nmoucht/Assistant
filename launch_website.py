@@ -47,8 +47,20 @@ def signUp():
 
 @app.route('/google')
 def google():
-    #google calendar code
-    return "something"
+       #google calendar code
+    home_dir = os.path.expanduser('~')
+    credential_dir = os.path.join(home_dir, '.credentials')
+    credential_path = os.path.join(credential_dir,
+                                   'calendar-python-quickstart.json')
+    store = Storage(credential_path)
+    credentials = store.get()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http=http)
+
+    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    print('Succesful authentification')
+   # http.close()
+    return "Congratulations!Succesful authentification"
    
 
 if __name__ == "__main__":
