@@ -29,3 +29,7 @@ class Schedule:
 
     def __repr__(self):
         return str(self.contents)
+
+    def __iter__(self):
+        for block_list in self.contents:
+            yield block_list

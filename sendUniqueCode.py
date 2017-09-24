@@ -11,19 +11,17 @@ def generatePinCode():
     code=[]
     for x in range(0, 5):
         if x != 4:
-            print x
             code.append(random.randint(0, 9))
-        else:
-            code.append(random.choice(string.letters))
-            generatedCode = ''.join( map(str , code))
-            return generatedCode
+    generatedCode = ''.join( map(str , code))
+    return generatedCode
 
 def sendCodeToUser(userPhoneNumber):
     code = generatePinCode()
-    message =  client.api.account.messages.create(to=userPhoneNumber,
-    from_= "+17329174392",
-    to = userPhoneNumber,
-    body= "Hi to access the meeting that you booked with Mr.Roshan Rishav, use this pin code " + code)
+    message =  client.api.account.messages.create(
+      to=userPhoneNumber,
+      from_= "+17329174392",
+      body= "Hi to access the meeting that you booked with Mr.Roshan Rishav, use this pin code " + code)
+    return code
 
 
 generatePinCode()

@@ -47,44 +47,47 @@ def get_credentials():
             credentials = tools.run_flow(flow, store, flags)
         else: # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
+        #print('Storing credentials to ' + credential_path)
     return credentials
 
 user_suggest = {
-      'summary': 'RoshanRishav Lunch',
+      'summary': 'RoshanRishav Dinner',
       'location': 'MC',
       'description': '',
       'start': {
-        'dateTime': '2017-09-22T09:00:00-07:00',
+        'dateTime': '2018-03-28T09:00:00-07:00',
         'timeZone': 'America/New_York',
       },
       'end': {
-        'dateTime': '2017-09-22T17:00:00-07:00',
+        'dateTime': '2018-03-28T10:00:00-07:00',
         'timeZone': 'America/New_York',
       }
      }
 
-def main():
+def listOfEvents(event_dict):
     credentials = get_credentials()
+    # print(credentials)
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
+    # print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
         calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
-
+    new_event = service.events().insert(calendarId='primary', body=event_dict).execute()
     if not events:
-        print('No upcoming events found.')
-    for event in events:
-        print (event)
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'], event['id'])
+        # print('No upcoming events found.')
+        for event in events:
+
+        # print (event)
+            start = event['start'].get('dateTime', event['start'].get('date'))
+        # print(start, event['summary'], event['id'])
 
 
 def create_event(event_dict):
     credentials = get_credentials()
+    # print(credentials)
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
     start_time = event_dict["start"]["dateTime"]
@@ -92,14 +95,16 @@ def create_event(event_dict):
     eventsResult = service.events().list(
         calendarId='primary', timeMax=end_time, timeMin=start_time, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
-    events = eventsResult.get('items', [])
-    print(event_dict)
-    print(events)
-    if not events:
-        event = service.events().insert(calendarId='primary', body=event_dict).execute()
-        print('Event created: %s' % (event.get('htmlLink')))
+    event_list = eventsResult.get('items', [])
+    # print(event_dict)
+    # print(event_list)
+    if not event_list:
+        new_event = service.events().insert(calendarId='primary', body=event_dict).execute()
+        # print('Event created: %s' % (new_event.get('htmlLink')))
+        # print("ID : " + new_event["id"])
+        return [new_event["id"] , "added"]
     else:
-        print("Busy")
+        # print("Busy")
         return "Busy"
 
 def fourteen_day_schedule():
@@ -117,36 +122,43 @@ def fourteen_day_schedule():
                                     "end_time"   : i['end']
                                 }
     print(event_dict)
-    convert_time_to_block(event_dict)
+    return event_dict
+    #convert_time_to_block(event_dict)
 
 def convert_time_to_block(events):
-    date= user_suggest['start']['dateTime']
-    start_day=date[8:10]
+    dictOfTimes={}
+    utc_datetime = datetime.datetime.utcnow()
+    currentTime = utc_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    start_day=currentTime[6:7]
     #date=date[15:]
-    start_time=date[date.index("T")+1:]
-    date= user_suggest['start']['dateTime']
+    start_time=currentTime[currentTime.index(" ")+1:]
+    #date= user_suggest['start']['dateTime']
     for key,value in events.iteritems():
         dateStart=value["start_time"]["dateTime"]
         dateEnd=value["end_time"]["dateTime"]
-        if(int(dateStart[8:10])-int(start_day)<=7):
-            #dateStart=dateStart[15:]
-            #dateEnd=dateEnd[15:]
-            timeStart=dateStart[dateStart.index("T")+1:dateStart.index("T")+9]
-            # print("sfgfs")
-            # print(timeStart)
-            timeEnd=dateEnd[dateEnd.index("T")+1:dateEnd.index("T")+9]
-            # print(int(timeEnd[1:timeStart.index(":")]))
-            hours=int(timeEnd[0:timeEnd.index(":")])-int(timeStart[0:timeStart.index(":")])
-            # print (timeEnd[timeEnd.index(":")+1 : timeEnd.index(":")+3])
-            # print ("2\n")
-            # print (int(timeStart[timeStart.index(":")+1 : timeStart.index(":")+3]))
-            minutes=int(timeEnd[timeEnd.index(":")+1 : timeEnd.index(":")+3]) - int(timeStart[timeStart.index(":")+1 : timeStart.index(":")+3])
-            duration=hours+minutes/24.0
-            day_Block_Index=int(dateStart[8:10])-int(start_day)
-            time_Block_Index=int(timeStart[0:timeStart.index(":")])+int(timeStart[timeStart.index(":")+1 : timeStart.index(":")+3])/60.0
-            print(day_Block_Index)
-            print (time_Block_Index/0.5)
-            print(duration)
+        timeStart=dateStart[dateStart.index("T")+1:dateStart.index("T")+9]
+        timeEnd=dateEnd[dateEnd.index("T")+1:dateEnd.index("T")+9]
+        hours=int(timeEnd[0:timeEnd.index(":")])-int(timeStart[0:timeStart.index(":")])
+        minutes=int(timeEnd[timeEnd.index(":")+1 : timeEnd.index(":")+3]) - int(timeStart[timeStart.index(":")+1 : timeStart.index(":")+3])
+        duration=hours+minutes/60.0
+        day_Block_Index=int(dateStart[8:10])-int(start_day)
+        time_Block_Index=int(timeStart[0:timeStart.index(":")])+int(timeStart[timeStart.index(":")+1 : timeStart.index(":")+3])/60.0
+        print(day_Block_Index)
+        print (time_Block_Index/0.5)
+        print(duration)
+        dayIndex=[("blockDay",day_Block_Index)]
+        timeIndex=[("blockTime",time_Block_Index)]
+        duration=[("duration",duration)]
+        dictOfTimes.update(dayIndex)
+        dictOfTimes.update(timeIndex)
+        dictOfTimes.update(duration)
+
+def convert_input_time_to_block(time):
+    hours=int(time[time.index(":")-2:time.index(":")])
+    minutes=int(time[time.index(":")+1 : time.index(":")+3])
+    time_Block_Index=hours+minutes/60.0
+    touple=(0,time_Block_Index/0.5)
+    return(touple)
 
 def cancel_event(event_id):
     credentials = get_credentials()
@@ -156,8 +168,8 @@ def cancel_event(event_id):
     print("Cancelled")
     return "Cancelled"
 
-
-if __name__ == '__main__':
-    #create_event(event_dict)
-   #main()
-   #fourteen_day_schedule()
+#if __name__ == "__main__":
+    #create_event(user_suggest);
+    #id = "dpntfuuh6ejnrktil3bb8ljmmg"
+    #listOfEvents(user_suggest)
+    #cancel_event(id)

@@ -29,7 +29,11 @@ def parse_request(request_text):
     elif 'intent' in entities:
         intent = entities.get('intent')[0].get('value')
     elif 'datetime' in entities:
-        datetime = entities['datetime'][0]['value']
+        try:
+            datetime = entities['datetime'][0]['value']
+        except Exception:
+            print(entities['datetime'][0])
+            raise KeyError
         intent = 'date_set'
     elif 'identify' in entities:
         name = entities['identify'][0]['value']
