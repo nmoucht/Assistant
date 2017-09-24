@@ -3,6 +3,7 @@ import string
 import organizing_data_helper
 from sendUniqueCode import sendCodeToUser, generatePinCode
 import makeEvent
+from schedule import day_block_to_date_string
 #from makeEvent import create_event, get_credentials
 from brain import parse_request, suggest_time
 from flask import Flask, request
@@ -23,6 +24,8 @@ event_ID = db.event_ID
 db.authenticate(name="nikosm",password="Netherlands1")
 # Account SID and
 
+enDate = ""
+starDate = ""
 event = {
   'summary': '',
   'location': '',
@@ -301,59 +304,41 @@ def getSuggestion():
             day, block=suggested_time
             print(day)
             print(block)
-            monthlist=["January","February","March","April","May","June","July","August","September","October","November","December"]
-            monthlistLength=[31,28,31,30,31,30,31,31,30,31,30,31]
-            monthIndex=int(currentTime[currentTime.index("-")+1:currentTime.index("-")+3])+1
-            currentMonth=monthlist[monthIndex]
-            daySuggest=int(currentTime[6:7])+day
-            if(daySuggest>monthlistLength[monthIndex]):
-                monthIndex+=1
-                currentMonth=monthlist[monthIndex]
-                daySuggest-=monthlistLength[monthIndex-1]
-            time=block*0.5
-            hour=floor(time/24)
-            minutes=(time-hour)*60
-            print(hour)
-            print(minutes)
-            timeMornorEve="am"
-            if(hour>12):
-                timeMornorEve="pm"
-                hour-=12
-            elif(hour==12):
-                timeMornorEve="pm"
-            strDate="A suggested date is "+str(currentMonth)+" "+str(daySuggest)+" 2017 at "+str(hour)+":"+str(minutes)+ " "+timeMornorEve
-            startDate=str(currentMonth)+" "+str(daySuggest)+" 2017 at "+str(hour)+":"+str(minutes)+ " "+timeMornorEve
-            print(strDate)
-            enDate= str(currentMonth)+" "+str(daySuggest)+" 2017 at "+str(hour + 1) +":"+str(minutes)+ " "+timeMornorEve
-            resp.say(strDate)
-            resp.say("Is this time ok with you?")
-            resp = VoiceResponse()
-            if 'SpeechResult' in request.values:
-                yesOrNo = request.values['SpeechResult']
-                if (needSuggestion == "Yes.") or (needSuggestion == "Yes") or (needSuggestion == "yes." or (needSuggestion == "yes") )  :
-
-                        #create event
-                    time_in_service = parse_request(startDate)
-                    endTime_in_service = parse_request(enDate)
-                    event['start']['dateTime'] = time_in_service[1]
-                    event['end']['dateTime'] = endTime_in_service[1]
-
-                    makeEvent.create_event(event)
-                    hasPickedDay=True
-                    resp.say("Cool, Your meeting has been booked. Have a nice day")
-                else:
-                    resp.say("Bye, have a nice day!")
-                        #add rejected time to rejected_times
-
-            # # check if he's fine, if he's not, add to rejected_times
-            # # in organizing_data the time that he rejected
-
-                #print("Make Suggestions")
+            enDate= day_block_to_date_string((day,block+2))
+            starDate=day_block_to_date_string((day,block))
+            print('A suggested date is '+str(starDate))
+            resp.say("A suggested date is "+str(starDate))
+            gather = Gather(input='speech dtmf', action='/bookOrNot')
+            gather.say("Is this time ok with you?")
+            resp.append(gather)
             return str(resp)
 
+@app.route('/bookOrNot', methods=['GET', 'POST'])
+def bookOrNot():
+    resp = VoiceResponse()
+    if 'SpeechResult' in request.values:
+        yesOrNo = request.values['SpeechResult']
+        if (yesOrNo == "Yes.") or (yesOrNo == "Yes") or (yesOrNo == "yes." or (yesOrNo == "yes") )  :
+            #create event
+            time_in_service = parse_request(starDate)
+            endTime_in_service = parse_request(enDate)
+            event['start']['dateTime'] = time_in_service[1]
+            event['end']['dateTime'] = endTime_in_service[1]
+
+            makeEvent.create_event(event)
+            hasPickedDay=True
+            resp.say("Cool, Your meeting has been booked. Have a nice day")
         else:
-            resp.say("No Problem, Have a good day ahead!")
-            return str(resp)
+            resp.say("Bye, have a nice day!")
+                #add rejected time to rejected_times
+
+    # # check if he's fine, if he's not, add to rejected_times
+    # # in organizing_data the time that he rejected
+
+        #print("Make Suggestions")
+    return str(resp)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

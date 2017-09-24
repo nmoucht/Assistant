@@ -3,6 +3,7 @@ body {
   /*background: -webkit-linear-gradient(to right, #e65245, #e43a15);  /* Chrome 10-25, Safari 5.1-6 */
   /*background: linear-gradient(to right, #e65245, #e43a15); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   background: rgb(34, 34, 34);
+  overflow-y: hidden;
 }
 
 
@@ -14,14 +15,43 @@ body {
 
 #left {
   width: 50%;
+  height: 100%;
 }
 
 #right {
   width: 50%;
+  height: 100%;
 }
 
 #canvas {
-  width: 100%;
-  height: 100%;
+  width: 200%;
+  height: 200%;
   position: absolute;
+  opacity: 0.5;
 }
+
+#heading{
+	font-size: 70px;
+	font-family: 'Work Sans', sans-serif;
+	text-align: center;
+	margin-top: 50px;
+	color: white;
+	height: 300px;
+}
+
+#btnSignUp{
+	text-align: center;
+	position: relative;
+	margin-left: 45%;
+}
+
+
+#twilio_text{
+	font-size: 30px;
+	font-family: 'Work Sans', sans-serif;
+	text-align: center;
+	color: #f45641;
+	position: relative;
+	margin-top: 70px;
+}
+

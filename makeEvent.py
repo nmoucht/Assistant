@@ -50,19 +50,31 @@ def get_credentials():
         #print('Storing credentials to ' + credential_path)
     return credentials
 
-user_suggest = {
-      'summary': 'RoshanRishav Dinner',
-      'location': 'MC',
-      'description': '',
-      'start': {
-        'dateTime': '2018-03-28T09:00:00-07:00',
-        'timeZone': 'America/New_York',
-      },
-      'end': {
-        'dateTime': '2018-03-28T10:00:00-07:00',
-        'timeZone': 'America/New_York',
-      }
-     }
+# user_suggest = {
+# <<<<<<< HEAD:makeEvent.py
+#       'summary': 'RoshanRishav Dinner',
+#       'location': 'MC',
+#       'description': '',
+#       'start': {
+#         'dateTime': '2018-03-28T09:00:00-07:00',
+#         'timeZone': 'America/New_York',
+#       },
+#       'end': {
+#         'dateTime': '2018-03-28T10:00:00-07:00',
+# =======
+#       'summary': 'PARTY',
+#       'location': 'MC',
+#       'description': '',
+#       'start': {
+#         'dateTime': '2017-09-28T09:00:00-07:00',
+#         'timeZone': 'America/New_York',
+#       },
+#       'end': {
+#         'dateTime': '2017-09-29T17:00:00-07:00',
+# >>>>>>> b18467a25acce26a92ab2c27bd5ca2f3faf5c384:pleasework.py
+#         'timeZone': 'America/New_York',
+#       }
+#      }
 
 def listOfEvents(event_dict):
     credentials = get_credentials()
