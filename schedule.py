@@ -20,7 +20,7 @@ def day_block_to_date_string(day_block):
 class Schedule:
     def __init__(self):
         self.contents = []
-        self.add_day(365) # add a year in advance
+        self.add_day(60) # add a year in advance
 
     def add_day(self, days_to_add = 1):
         for i in range(days_to_add):
@@ -40,3 +40,7 @@ class Schedule:
 
     def __repr__(self):
         return str(self.contents)
+
+    def __iter__(self):
+        for block_list in self.contents:
+            yield block_list
