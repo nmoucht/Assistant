@@ -40,57 +40,6 @@ event = {
   }
  }
 
-
-#
-# @app.route("/yesorno", methods=['GET', 'POST'])
-# def yesorno(dataType):
-#     if ['SpeechResult'] in request.values:
-#         if request.values['SpeechResult'] == "Yes.":
-#             return true
-#         else:
-#             return false
-#
-#
-#
-# def confirm(dataType, data):
-#     resp = VoiceResponse()
-#     if dataType == "name":
-#         gather = Gather(input='speech dtmf', action='/yesorno')
-#         gather.say("Hi, " + data + "Did I say your name right?")
-#         resp.append(gather)
-#
-#         resp.redirect('/confirm')
-#         return str(resp)
-#     elif dataType == "summary":
-#         gather = Gather(input='speech dtmf', action='/yesorno')
-#         gather.say("Hi, " + "Is this the right description for your meeting? " + data)
-#         resp.append(gather)
-#
-#         resp.redirect('/confirm')
-#     elif dataType == "location":
-#         gather = Gather(input='speech dtmf', action='/yesorno')
-#         gather.say("Hi, " + "Is this the right location for your meeting? " + data)
-#         resp.append(gather)
-#
-#         resp.redirect('/confirm')
-#     elif dataType == "startTime":
-#         gather = Gather(input='speech dtmf', action='/yesorno')
-#         gather.say("Hi, " + "Is this the right start time for your meeting? " + data)
-#         resp.append(gather)
-#
-#         resp.redirect('/confirm')
-#     elif dataType == "endTime":
-#         gather = Gather(input='speech dtmf', action='/yesorno')
-#         gather.say("Hi, " + "Is this the right end time for your meeting? " + data)
-#         resp.append(gather)
-#
-#         resp.redirect('/confirm')
-#
-#
-#
-#
-#--DB
-
 def addEventIDtoDatabase(eventID, eventCode):
 	eventCode=[("eventCode",eventCode)]
 	eventID=[("event_ID",eventID)]
